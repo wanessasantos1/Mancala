@@ -5,12 +5,12 @@ from modules.interface_usuario import InterfaceUsuario
 from modules.mancala_board import MancalaBoard
 from modules.jogador import Jogador
 
-__author__ = ['Wanessa Pinto dos Santos']
+__author__ = 'Wanessa Pinto dos Santos'
 __copyright__ = 'Copyright 2022'
-__credits__ = ['Wanessa Pinto Santos']
+__credits__ = __author__
 __license__ = 'GPL'
 __version__ = '1.0.0'
-__maintainer__ = 'Wanessa Pinto dos Santos'
+__maintainer__ = __author__
 __email__ = 'wanessa.santos@poli.ufrj.br'
 __status__ = 'Production'
 
