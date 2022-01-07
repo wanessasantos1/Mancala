@@ -1,6 +1,11 @@
 class Mancala:
-    player_1_score = 0
-    player_2_score = 0
+    """
+        Esta super classe inclui todos os métodos e atributos que são úteis para a montagem e gerenciamento do jogo principal.
+        Faz a montagem inicial de cada player;
+        Faz a montagem inicial de cada tipo de quantidade de peça do jogo;
+
+        Inicia vazio o board de cada linha que irá representar o tabuleiro.
+    """
 
     __player_board = [
         [4, 4, 4, 4, 4, 4, 0],
@@ -22,6 +27,11 @@ class Mancala:
     __board_linha_10 = ''
 
     def __calcular_pontuacao_cava__(self, tamanho, player, local):
+        """
+            Função privada que recebe o tamanho total de slots que cada casa possui para preencher o tabuleiro;
+            Recebe player para gerenciar a casa de jogo e o local representa o index da cava, ou seja, qual cava vai selecionar.
+            Retorna um array de numero com a pontuação local (cava)
+        """
         cava_pontuacao = []
 
         for x in range(0, tamanho, 1):
@@ -43,6 +53,10 @@ class Mancala:
         return cava_pontuacao
 
     def __montar_cava_pontuacao__(self, player):
+        """
+            Função privada que recebe o player para a montagem com a pontuação da cava.
+            Retorna a propria classe e salva na linha representante a montagem do tabuleiro com a pontuação.
+        """
         cava_pontuacao = self.__calcular_pontuacao_cava__(9, player, -1)
 
         self.__board_linha_00 += ('⎾ ⎺ ⎺ ⏋ \t')
@@ -60,6 +74,10 @@ class Mancala:
         return self
 
     def __montar_cavas__(self, player, cava):
+        """
+            Função privada que recebe o player para a contagem da pontuação da cava.
+            Retorna a propria classe e salva na linha representante a montagem do tabuleiro com a pontuação.
+        """
         cava_pontuacao = self.__calcular_pontuacao_cava__(3, player, cava)
         
         if (player == 0):
@@ -81,6 +99,10 @@ class Mancala:
         return self
 
     def movimentar_peca(self, player, cava):
+        """
+            Função que recebe o player para a movimentação da cava selecionada.
+            Retorna a propria classe e faz o gerenciamento de movimentação de pedrinha em cada cava.
+        """
         if ((cava < 0) | (cava > 5)):
             print('Cava inválida!')
             return self
@@ -90,7 +112,9 @@ class Mancala:
         cava_qntd_pecas = self.__player_board[player][cava]
     
     def show_board(self):
-
+        """
+            Função que retorna a propria classe e faz um print na tela com o tabuleiro montado.
+        """
         self.__montar_cava_pontuacao__(0)
 
         for player_index in range(0, 2, 1):
