@@ -1,4 +1,4 @@
-class Mancala:
+class MancalaBoard:
     """
         Esta super classe inclui todos os métodos e atributos que são úteis para a montagem e gerenciamento do jogo principal.
         Faz a montagem inicial de cada player;
@@ -26,11 +26,21 @@ class Mancala:
     __board_linha_09 = ''
     __board_linha_10 = ''
 
+    def __str__(self):
+        """
+            Método de representação em String.
+            
+            (MancalaBoard) -> str
+        """
+        return None
+
     def __calcular_pontuacao_cava__(self, tamanho, player, local):
         """
             Função privada que recebe o tamanho total de slots que cada casa possui para preencher o tabuleiro;
             Recebe player para gerenciar a casa de jogo e o local representa o index da cava, ou seja, qual cava vai selecionar.
             Retorna um array de numero com a pontuação local (cava)
+
+            (int, int, int) -> [[str]]
         """
         cava_pontuacao = []
 
@@ -56,6 +66,8 @@ class Mancala:
         """
             Função privada que recebe o player para a montagem com a pontuação da cava.
             Retorna a propria classe e salva na linha representante a montagem do tabuleiro com a pontuação.
+
+            (int) -> MancalaBoard
         """
         cava_pontuacao = self.__calcular_pontuacao_cava__(9, player, -1)
 
@@ -77,6 +89,8 @@ class Mancala:
         """
             Função privada que recebe o player para a contagem da pontuação da cava.
             Retorna a propria classe e salva na linha representante a montagem do tabuleiro com a pontuação.
+
+            (int, int) -> MancalaBoard
         """
         cava_pontuacao = self.__calcular_pontuacao_cava__(3, player, cava)
         
@@ -102,6 +116,8 @@ class Mancala:
         """
             Função que recebe o player para a movimentação da cava selecionada.
             Retorna a propria classe e faz o gerenciamento de movimentação de pedrinha em cada cava.
+
+            (int, int) -> MancalaBoard
         """
         if ((cava < 0) | (cava > 5)):
             print('Cava inválida!')
@@ -114,6 +130,8 @@ class Mancala:
     def show_board(self):
         """
             Função que retorna a propria classe e faz um print na tela com o tabuleiro montado.
+
+            (None) -> MancalaBoard
         """
         self.__montar_cava_pontuacao__(0)
 
@@ -136,3 +154,20 @@ class Mancala:
         print(self.__board_linha_10)
 
         return self
+    
+    def get_manual():
+        """
+            Esta função estática (chamada sempre através de Tela.getManual()) retorna um 
+            dicionário que mapeia os nomes dos atributos e métodos às suas descrições.
+            
+            (None) -> dict
+        """
+        manual = dict()
+        manual['__init__'] = MancalaBoard.__init__.__doc__
+        manual['__str__'] = MancalaBoard.__str__.__doc__
+        manual['show_board'] = MancalaBoard.show_board.__doc__
+        manual['movimentar_peca'] = MancalaBoard.movimentar_peca.__doc__
+        manual['__player_board'] = '# Lista de listas que representa o tabuleiro do jogo.'
+        manual['__pecas_jogo'] = '# Representação gráfica das peças do jogo.'
+        manual['__board_linha_00 ate 10'] = '# Representação gráfica da linha XX do tabuleiro.'
+        return manual
