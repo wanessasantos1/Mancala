@@ -1,5 +1,4 @@
-import os
-
+import os, datetime
 
 class MancalaBoard:
     """
@@ -49,7 +48,16 @@ class MancalaBoard:
         print('Insira o nome do jogador 2:')
         self.nome_jogador_2 = input()
 
+        self.__player_board = [
+            [4, 4, 4, 4, 4, 4, 0],
+            [4, 4, 4, 4, 4, 4, 0]
+        ]
+        self.__turno_jogador_1 = True
+
+        self.__limpar_tabuleiro__()
+
         self.jogo_status = 1
+        self.log('MANCALA-INICIO', 'INFO', 'Um novo jogo foi iniciado com sucesso!')
 
         return self
 
@@ -143,6 +151,8 @@ class MancalaBoard:
             (int, int) -> MancalaBoard
         """
 
+        pontuacao_cava_oposta = 0
+
         if (self.__player_board[player_board][cava] == 1):
             if (player_board == 0):
                 pontuacao_cava_oposta = self.__player_board[1][cava]
@@ -155,7 +165,8 @@ class MancalaBoard:
 
                 self.__player_board[1][6] += pontuacao_cava_oposta
                 self.__player_board[0][cava] = 0
-        
+
+            self.log('MANCALA-MOVIMENTO', 'INFO', 'Jogador {0} realizou um bom movimento e capturou um total de '+ str(pontuacao_cava_oposta) +' do inimigo!', player_board)
 
         return self
 
@@ -185,22 +196,25 @@ class MancalaBoard:
             (int, int) -> MancalaBoard
         """
 
-        print("NUM CAVA: {0}".format(cava))
-        if ((cava < 0) or (cava > 5)):
-            print('Cava inválida!')
-            os.system('pause')
-            return self
-
         direcao = -1 if self.__turno_jogador_1 else 1
         is_player_board = 0 if self.__turno_jogador_1 else 1
+
+        if ((cava < 0) or (cava > 5)):
+            print('Cava inválida!')
+            self.log('MANCALA-MOVIMENTO', 'WARN', 'Jogador {0} informou uma cava ('+ str(cava) +') inválida!', is_player_board)
+            os.system('pause')
+            return self
         
         cava_qntd_pecas = self.__player_board[is_player_board][cava]
         self.__player_board[is_player_board][cava] = 0
 
         if (cava_qntd_pecas == 0):
             print('Esta cava está vazia!')
+            self.log('MANCALA-MOVIMENTO', 'WARN', 'Jogador {0} informou uma cava ('+ str(cava) +') vazia!', is_player_board)
             os.system('pause')
             return self
+        
+        self.log('MANCALA-MOVIMENTO', 'INFO', 'Jogador {0} realizou um movimento da cava ('+ str(cava) +')!', is_player_board)
         
         while cava_qntd_pecas > 0:
             cava += direcao
@@ -229,7 +243,10 @@ class MancalaBoard:
         if (cava != -1 and cava != 6):
             self.__verifica_cava_vazia__(cava, is_player_board)
             self.__turno_jogador_1 = not self.__turno_jogador_1
+        else:
+            self.log('MANCALA-MOVIMENTO', 'INFO', 'Jogador {0} realizou um bom movimento e vai jogar novamente!', is_player_board)
 
+        self.salvar_jogo()
         self.__verifica_termino_jogo__()
 
         return self
@@ -240,7 +257,7 @@ class MancalaBoard:
 
             (void) -> MancalaBoard
         """
-        
+
         self.__board_linha_00 = ''
         self.__board_linha_01 = ''
         self.__board_linha_02 = ''
@@ -294,12 +311,13 @@ class MancalaBoard:
             (None) -> MancalaBoard
         """
 
-        print("Vez do jogador {0}".format(self.nome_jogador_1 if self.__turno_jogador_1 == False else self.nome_jogador_2))
+        print("Vez do jogador {0}".format(self.nome_jogador_1 if self.__turno_jogador_1 else self.nome_jogador_2))
         print("Selecione a cava para jogar:")
         try:
             cava = int(input())
         except:
             print("Insira uma número de cava válida!")
+            self.log('MANCALA-JOGAR', 'EXCEPT', 'O jogador {0} tentou inserir um caractere inválido!', 0 if self.__turno_jogador_1 else 1)
             os.system('pause')
             return self
 
@@ -307,11 +325,59 @@ class MancalaBoard:
 
         return self
 
+    def salvar_jogo(self):
+        """
+            Função que salva o jogo atual.
+
+            (None) -> MancalaBoard
+        """
+
+        save_file = open("saves/save_1.txt", "w+")
+
+        save_file.write('nome_jogador_1: ' + self.nome_jogador_1 + '\n')
+        save_file.write('nome_jogador_2: ' + self.nome_jogador_2 + '\n')
+        save_file.write('turno_jogador_1: ' + str(self.__turno_jogador_1) + '\n')
+        save_file.write('player_board: ' + str(self.__player_board) + '\n')
+
+        save_file.close()
+
+        return self
+
+    def carregar_jogo(self):
+        """
+            Função que carrega o jogo salvo.
+
+            (None) -> Boolean
+        """
+
+        try:
+            save_file = open("saves/save_1.txt", "r")
+
+            for line in save_file:
+                if (line.startswith('nome_jogador_1: ')):
+                    self.nome_jogador_1 = line.replace('nome_jogador_1: ', '').replace('\n', '')
+                elif (line.startswith('nome_jogador_2: ')):
+                    self.nome_jogador_2 = line.replace('nome_jogador_2: ', '').replace('\n', '')
+                elif (line.startswith('turno_jogador_1: ')):
+                    self.__turno_jogador_1 = bool(line.replace('turno_jogador_1: ', '').replace('\n', ''))
+                elif (line.startswith('player_board: ')):
+                    self.__player_board = eval(line.replace('player_board: ', '').replace('\n', ''))
+
+            save_file.close()
+            self.jogo_status = 1
+
+            return True
+        except:
+            print("Não foi possível carregar o jogo! Iniciando novo jogo!")
+            self.log('MANCALA-CARREGAR', 'EXCEPT', 'Não foi possível carregar o jogo!')
+            os.system('pause')
+            return self
+
     def finaliza_jogo(self):
         """
             Função que finaliza o jogo e retorna a pontuação final.
 
-            (None) -> [int, int]
+            (None) -> [string, int]
         """
 
         soma1 = 0
@@ -323,7 +389,32 @@ class MancalaBoard:
         self.__player_board[0][6] += soma1
         self.__player_board[1][6] += soma2
 
-        return [self.__player_board[0][6], self.__player_board[1][6]]
+        self.log('MANCALA-FINAL', 'INFO', 'Jogo finalizado com sucesso')
+
+        if (self.__player_board[0][6] > self.__player_board[1][6]): 
+            self.log('MANCALA-FINAL', 'INFO', 'O ganhador foi o Jogador {0} com {1} pontos'.format(self.nome_jogador_1, self.__player_board[0][6]))
+            return [self.nome_jogador_1, self.__player_board[0][6]]
+        else:
+            self.log('MANCALA-FINAL', 'INFO', 'O ganhador foi o Jogador {0} com {1} pontos'.format(self.nome_jogador_2, self.__player_board[1][6]))
+            return [self.nome_jogador_2, self.__player_board[1][6]]
+
+    def log(self, area, action, texto, jogador=-1):
+        data_atual = datetime.datetime.now()
+        data_hora_atual = data_atual.strftime("%d/%m/%Y %H:%M:%S")
+
+        if (jogador != -1):
+            texto = texto.format(self.nome_jogador_1 if jogador == 0 else self.nome_jogador_2)
+
+        message = "{0} [{1}-{2}]: {3}".format(data_hora_atual, area, action, texto)
+
+        log_file = open("log/log.txt", "a+")
+
+        log_file.write(message + "\n")
+        log_file.close()
+
+
+        print(message)
+        return self
     
     def get_manual():
         """

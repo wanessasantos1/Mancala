@@ -5,6 +5,7 @@ from modules.jogador import Jogador
 
 class Mancala(InterfaceUsuario):
     qntdPecas = 36
+    game = MancalaBoard()
 
     def __init__(self, qntdPecas=36):
         """
@@ -38,16 +39,31 @@ class Mancala(InterfaceUsuario):
         return saida
 
     def novo_jogo(self):
-        game = MancalaBoard()
-
         os.system('cls')
-        game.inicializar_jogo()
 
-        while(game.jogo_iniciado == 1):
-            game.mostrar_tabuleiro()
-            game.jogar()
+        if (self.game.jogo_status == 0):
+            self.game.inicializar_jogo()
+            self.game.salvar_jogo()
 
-        if (game.jogo_status == 10):
-            game.finaliza_jogo()
+        while(self.game.jogo_status == 1):
+            self.game.mostrar_tabuleiro()
+            self.game.jogar()
+
+        if(self.game.jogo_status == 5):
+            self.game.salvar_jogo()
+
+        if (self.game.jogo_status == 10):
+            ganhador = self.game.finaliza_jogo()
+
+            os.system('cls')
+            print('O ganhador da partida foi {0} com {1} pontos'.format(ganhador[0], ganhador[1]))
 
         os.system('pause')
+
+        return self
+    
+    def carregar_jogo(self):
+        carregado_sucesso = self.game.carregar_jogo()
+
+        if (carregado_sucesso): self.novo_jogo()
+        pass
