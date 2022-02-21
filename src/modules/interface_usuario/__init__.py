@@ -69,3 +69,17 @@ class InterfaceUsuario:
         """
         for char in self.tabelaCaracteres.values():
             print(char)
+
+    def render_menu_principal(self):
+        """
+            Printa na tela o menu principal.
+        """
+        os.system('cls')
+        print("0. Sair")
+        print("1. Novo Jogo")
+        print("2. Carregar Jogo")
+        print("3. Configurações")
+        print("4. Ajuda")
+        print("5. Sobre")
+        print("6. Manual do Desenvolvedor")
+        print("7. Estatística")

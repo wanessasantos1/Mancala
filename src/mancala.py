@@ -1,9 +1,7 @@
-import sys
+import sys, os
 sys.path.insert(0,"..")
 
-from modules.interface_usuario import InterfaceUsuario
-from modules.mancala_board import MancalaBoard
-from modules.jogador import Jogador
+from modules.mancala_manager import Mancala
 
 __author__ = 'Wanessa Pinto dos Santos'
 __copyright__ = 'Copyright 2022'
@@ -14,38 +12,26 @@ __maintainer__ = __author__
 __email__ = 'wanessa.santos@poli.ufrj.br'
 __status__ = 'Production'
 
-class Mancala(InterfaceUsuario):
-    qntdPecas = 36
+hasStop = False
 
-    def __init__(self, qntdPecas=36):
-        """
-            O construtor cria um novo jogo a partir das configurações passadas:
-            
-            - Quantidade de peças (padrão 36)
-            
-            Representação: Uma representação com caracteres especiais no tabuleiro com a quantidade de peças dentro da cava
-        """
+mancala = Mancala()
 
-        pass
+while (hasStop == False): 
 
-    def __str__(self):
-        """
-            Este método, usado para representação em string, é a base da ETAPA 4.4. Aqui será
-            retornada a String que contém as descrições de todos os métodos e atributos das 
-            classes.
-        """
-        saida = ""
-        manuais = []
+    try:
+        mancala.render_menu_principal()
+        print("Digite a opção desejada: ")
 
-        manuais.append(["MANUAL DA CLASSE BOARD", MancalaBoard.get_manual()],)
-        manuais.append(["MANUAL DA CLASSE JOGADOR", Jogador.get_manual()])
-
-        for manual in manuais:
-            saida += manual[0] + "\n"
-            for chave in manual[1]:
-                saida += f'{chave} : {manual[1].get(chave)}\n'
-            saida +='\n'
-        
-        return saida
-
-print(Mancala())
+        opcao = input()
+        if (opcao == "0"):
+            hasStop = True
+        elif (opcao == "1"):
+            mancala.novo_jogo()
+        elif (opcao == "2"):
+            mancala.carregar_jogo()
+        else:
+            print("Opção inválida!")
+            os.system('pause')
+    except Exception as e:
+        print(e)
+        os.system('pause')
