@@ -29,6 +29,12 @@ while (hasStop == False):
             mancala.novo_jogo()
         elif (opcao == "2"):
             mancala.carregar_jogo()
+        elif (opcao == "3"):
+            mancala.jogo_ajuda()
+        elif (opcao == "4"):
+            mancala.manual_projeto()
+        elif (opcao == "5"):
+            mancala.estatistica()
         else:
             print("Opção inválida!")
             os.system('pause')

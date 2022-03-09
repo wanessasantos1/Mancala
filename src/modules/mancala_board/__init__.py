@@ -1,4 +1,7 @@
 import os, datetime
+from modules.errors.mancala_errors import MancalaLoadGameError, MancalaMovementInvalidError
+
+from modules.jogador import Jogador
 
 class MancalaBoard:
     """
@@ -9,8 +12,8 @@ class MancalaBoard:
         Inicia vazio o board de cada linha que irá representar o tabuleiro.
     """
 
-    nome_jogador_1 = 'Jogador 1'
-    nome_jogador_2 = 'Jogador 2'
+    jogador_1 = Jogador()
+    jogador_2 = Jogador()
     __turno_jogador_1 = True
 
     jogo_status = 0
@@ -44,9 +47,12 @@ class MancalaBoard:
 
     def inicializar_jogo(self):
         print('Insira o nome do jogador 1:')
-        self.nome_jogador_1 = input()
+        nome_jogador_1 = input()
         print('Insira o nome do jogador 2:')
-        self.nome_jogador_2 = input()
+        nome_jogador_2 = input()
+
+        self.jogador_1.set_nome(nome_jogador_1).carregar()
+        self.jogador_2.set_nome(nome_jogador_2).carregar()
 
         self.__player_board = [
             [4, 4, 4, 4, 4, 4, 0],
@@ -54,7 +60,7 @@ class MancalaBoard:
         ]
         self.__turno_jogador_1 = True
 
-        self.__limpar_tabuleiro__()
+        self.limpar_tabuleiro()
 
         self.jogo_status = 1
         self.log('MANCALA-INICIO', 'INFO', 'Um novo jogo foi iniciado com sucesso!')
@@ -66,7 +72,7 @@ class MancalaBoard:
 
         return self
 
-    def __calcular_pontuacao_cava__(self, tamanho, player, local):
+    def calcular_pontuacao_cava(self, tamanho, player, local):
         """
             Função privada que recebe o tamanho total de slots que cada casa possui para preencher o tabuleiro;
             Recebe player para gerenciar a casa de jogo e o local representa o index da cava, ou seja, qual cava vai selecionar.
@@ -94,14 +100,14 @@ class MancalaBoard:
 
         return cava_pontuacao
 
-    def __montar_cava_pontuacao__(self, player):
+    def montar_cava_pontuacao(self, player):
         """
             Função privada que recebe o player para a montagem com a pontuação da cava.
             Retorna a propria classe e salva na linha representante a montagem do tabuleiro com a pontuação.
 
             (int) -> MancalaBoard
         """
-        cava_pontuacao = self.__calcular_pontuacao_cava__(9, player, -1)
+        cava_pontuacao = self.calcular_pontuacao_cava(9, player, -1)
 
         self.__board_linha_00 += ('⎾ ⎺ ⎺ ⏋ \t')
         self.__board_linha_01 += ('| {0} {1} | \t'.format(cava_pontuacao[0][0], cava_pontuacao[0][1]))
@@ -117,14 +123,14 @@ class MancalaBoard:
 
         return self
 
-    def __montar_cavas__(self, player, cava):
+    def montar_cavas(self, player, cava):
         """
             Função privada que recebe o player para a contagem da pontuação da cava.
             Retorna a propria classe e salva na linha representante a montagem do tabuleiro com a pontuação.
 
             (int, int) -> MancalaBoard
         """
-        cava_pontuacao = self.__calcular_pontuacao_cava__(3, player, cava)
+        cava_pontuacao = self.calcular_pontuacao_cava(3, player, cava)
         
         if (player == 0):
             self.__board_linha_00 += ('⎾ ⎺ {0} ⏋ \t'.format(cava if self.__turno_jogador_1 else '⎺'))
@@ -143,7 +149,7 @@ class MancalaBoard:
 
         return self
 
-    def __verifica_cava_vazia__(self, cava, player_board):
+    def verifica_cava_vazia(self, cava, player_board):
         """
             Função privada que verifica se a cava está vazia.
             Retorna True se a cava estiver vazia, False se não estiver.
@@ -170,7 +176,7 @@ class MancalaBoard:
 
         return self
 
-    def __verifica_termino_jogo__(self):
+    def verifica_termino_jogo(self):
         """
             Função privada que verifica se o jogo terminou.
             
@@ -188,7 +194,7 @@ class MancalaBoard:
 
         return self
 
-    def __movimentar_peca__(self, cava):
+    def movimentar_peca(self, cava):
         """
             Função que recebe o player para a movimentação da cava selecionada.
             Retorna a propria classe e faz o gerenciamento de movimentação de pedrinha em cada cava.
@@ -241,17 +247,17 @@ class MancalaBoard:
             cava_qntd_pecas -= 1
 
         if (cava != -1 and cava != 6):
-            self.__verifica_cava_vazia__(cava, is_player_board)
+            self.verifica_cava_vazia(cava, is_player_board)
             self.__turno_jogador_1 = not self.__turno_jogador_1
         else:
             self.log('MANCALA-MOVIMENTO', 'INFO', 'Jogador {0} realizou um bom movimento e vai jogar novamente!', is_player_board)
 
         self.salvar_jogo()
-        self.__verifica_termino_jogo__()
+        self.verifica_termino_jogo()
 
         return self
 
-    def __limpar_tabuleiro__(self):
+    def limpar_tabuleiro(self):
         """
             Função privada que limpa o tabuleiro.
 
@@ -281,14 +287,14 @@ class MancalaBoard:
 
         os.system('cls')
         
-        self.__limpar_tabuleiro__()
-        self.__montar_cava_pontuacao__(0)
+        self.limpar_tabuleiro()
+        self.montar_cava_pontuacao(0)
 
         for player_index in range(0, 2, 1):
             for cava_index in range(0, 6, 1):
-                self.__montar_cavas__(player_index, cava_index)
+                self.montar_cavas(player_index, cava_index)
 
-        self.__montar_cava_pontuacao__(1)
+        self.montar_cava_pontuacao(1)
         
         print(self.__board_linha_00)
         print(self.__board_linha_01)
@@ -311,17 +317,18 @@ class MancalaBoard:
             (None) -> MancalaBoard
         """
 
-        print("Vez do jogador {0}".format(self.nome_jogador_1 if self.__turno_jogador_1 else self.nome_jogador_2))
+        print("Vez do jogador {0}".format(self.jogador_1.get_nome() if self.__turno_jogador_1 else self.jogador_2.get_nome()))
         print("Selecione a cava para jogar:")
         try:
             cava = int(input())
         except:
             print("Insira uma número de cava válida!")
-            self.log('MANCALA-JOGAR', 'EXCEPT', 'O jogador {0} tentou inserir um caractere inválido!', 0 if self.__turno_jogador_1 else 1)
+            message = 'O jogador {0} tentou inserir um caractere inválido!', 0 if self.__turno_jogador_1 else 1
+            self.log('MANCALA-JOGAR', 'EXCEPT', message)
             os.system('pause')
-            return self
+            raise MancalaMovementInvalidError(message)
 
-        self.__movimentar_peca__(cava)
+        self.movimentar_peca(cava)
 
         return self
 
@@ -334,8 +341,8 @@ class MancalaBoard:
 
         save_file = open("saves/save_1.txt", "w+")
 
-        save_file.write('nome_jogador_1: ' + self.nome_jogador_1 + '\n')
-        save_file.write('nome_jogador_2: ' + self.nome_jogador_2 + '\n')
+        save_file.write('nome_jogador_1: ' + self.jogador_1.get_nome() + '\n')
+        save_file.write('nome_jogador_2: ' + self.jogador_2.get_nome() + '\n')
         save_file.write('turno_jogador_1: ' + str(self.__turno_jogador_1) + '\n')
         save_file.write('player_board: ' + str(self.__player_board) + '\n')
 
@@ -355,9 +362,9 @@ class MancalaBoard:
 
             for line in save_file:
                 if (line.startswith('nome_jogador_1: ')):
-                    self.nome_jogador_1 = line.replace('nome_jogador_1: ', '').replace('\n', '')
+                    self.jogador_1.set_nome(line.replace('nome_jogador_1: ', '').replace('\n', ''))
                 elif (line.startswith('nome_jogador_2: ')):
-                    self.nome_jogador_2 = line.replace('nome_jogador_2: ', '').replace('\n', '')
+                    self.jogador_2.set_nome(line.replace('nome_jogador_2: ', '').replace('\n', ''))
                 elif (line.startswith('turno_jogador_1: ')):
                     self.__turno_jogador_1 = bool(line.replace('turno_jogador_1: ', '').replace('\n', ''))
                 elif (line.startswith('player_board: ')):
@@ -371,7 +378,7 @@ class MancalaBoard:
             print("Não foi possível carregar o jogo! Iniciando novo jogo!")
             self.log('MANCALA-CARREGAR', 'EXCEPT', 'Não foi possível carregar o jogo!')
             os.system('pause')
-            return self
+            raise MancalaLoadGameError('Não foi possível carregar o jogo!')
 
     def finaliza_jogo(self):
         """
@@ -391,19 +398,25 @@ class MancalaBoard:
 
         self.log('MANCALA-FINAL', 'INFO', 'Jogo finalizado com sucesso')
 
+        self.jogo_status = 0
+
         if (self.__player_board[0][6] > self.__player_board[1][6]): 
-            self.log('MANCALA-FINAL', 'INFO', 'O ganhador foi o Jogador {0} com {1} pontos'.format(self.nome_jogador_1, self.__player_board[0][6]))
-            return [self.nome_jogador_1, self.__player_board[0][6]]
+            self.log('MANCALA-FINAL', 'INFO', 'O ganhador foi o Jogador {0} com {1} pontos'.format(self.jogador_1.get_nome(), self.__player_board[0][6]))
+            self.jogador_1.nova_vitoria().nova_pontuacao(self.__player_board[0][6]).salvar()
+            self.jogador_2.nova_derrota().nova_pontuacao(self.__player_board[1][6]).salvar()
+            return [self.jogador_1.get_nome(), self.__player_board[0][6]]
         else:
-            self.log('MANCALA-FINAL', 'INFO', 'O ganhador foi o Jogador {0} com {1} pontos'.format(self.nome_jogador_2, self.__player_board[1][6]))
-            return [self.nome_jogador_2, self.__player_board[1][6]]
+            self.log('MANCALA-FINAL', 'INFO', 'O ganhador foi o Jogador {0} com {1} pontos'.format(self.jogador_2.get_nome(), self.__player_board[1][6]))
+            self.jogador_1.nova_derrota().nova_pontuacao(self.__player_board[0][6]).salvar()
+            self.jogador_2.nova_vitoria().nova_pontuacao(self.__player_board[1][6]).salvar()
+            return [self.jogador_2.get_nome(), self.__player_board[1][6]]
 
     def log(self, area, action, texto, jogador=-1):
         data_atual = datetime.datetime.now()
         data_hora_atual = data_atual.strftime("%d/%m/%Y %H:%M:%S")
 
         if (jogador != -1):
-            texto = texto.format(self.nome_jogador_1 if jogador == 0 else self.nome_jogador_2)
+            texto = texto.format(self.jogador_1.get_nome() if jogador == 0 else self.jogador_2.get_nome())
 
         message = "{0} [{1}-{2}]: {3}".format(data_hora_atual, area, action, texto)
 
@@ -411,7 +424,6 @@ class MancalaBoard:
 
         log_file.write(message + "\n")
         log_file.close()
-
 
         print(message)
         return self
@@ -426,9 +438,28 @@ class MancalaBoard:
         manual = dict()
         manual['__init__'] = MancalaBoard.__init__.__doc__
         manual['__str__'] = MancalaBoard.__str__.__doc__
-        manual['show_board'] = MancalaBoard.show_board.__doc__
+        manual['inicializar_jogo'] = MancalaBoard.inicializar_jogo.__doc__
+        manual['comecar_jogo'] = MancalaBoard.comecar_jogo.__doc__
+        manual['calcular_pontuacao_cava'] = MancalaBoard.calcular_pontuacao_cava.__doc__
+        manual['montar_cava_pontuacao'] = MancalaBoard.montar_cava_pontuacao.__doc__
+        manual['montar_cavas'] = MancalaBoard.montar_cavas.__doc__
+        manual['verifica_cava_vazia'] = MancalaBoard.verifica_cava_vazia.__doc__
+        manual['verifica_termino_jogo'] = MancalaBoard.verifica_termino_jogo.__doc__
         manual['movimentar_peca'] = MancalaBoard.movimentar_peca.__doc__
+        manual['limpar_tabuleiro'] = MancalaBoard.limpar_tabuleiro.__doc__
+        manual['mostrar_tabuleiro'] = MancalaBoard.mostrar_tabuleiro.__doc__
+        manual['jogar'] = MancalaBoard.jogar.__doc__
+        manual['salvar_jogo'] = MancalaBoard.salvar_jogo.__doc__
+        manual['carregar_jogo'] = MancalaBoard.carregar_jogo.__doc__
+        manual['finaliza_jogo'] = MancalaBoard.finaliza_jogo.__doc__
         manual['__player_board'] = '# Lista de listas que representa o tabuleiro do jogo.'
         manual['__pecas_jogo'] = '# Representação gráfica das peças do jogo.'
         manual['__board_linha_00 ate 10'] = '# Representação gráfica da linha XX do tabuleiro.'
+        manual['jogador_1'] = '# Representação do jogador 1.'
+        manual['jogador_2'] = '# Representação do jogador 2.'
+        manual['__turno_jogador_1'] = '# Indica se o turno é do jogador 1.'
+        manual['jogo_status'] = '# Indica o status do jogo. 0 - Jogo não iniciado. 1 - Jogo iniciado. 2 - Jogo finalizado.'
+        manual['__player_board'] = '# Lista de listas que representa o tabuleiro do jogo.'
+        manual['__pecas_jogo'] = '# Representação gráfica das peças do jogo.'
+        manual['__board_linha_00'] = '# Representação gráfica da linha XX do tabuleiro.'
         return manual

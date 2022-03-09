@@ -39,6 +39,10 @@ class Mancala(InterfaceUsuario):
         return saida
 
     def novo_jogo(self):
+        """
+            Inicia um novo jogo
+        """
+
         os.system('cls')
 
         if (self.game.jogo_status == 0):
@@ -67,3 +71,48 @@ class Mancala(InterfaceUsuario):
 
         if (carregado_sucesso): self.novo_jogo()
         pass
+
+    def jogo_ajuda(self):
+        os.system('cls')
+        print('''
+            O Mancala é um jogo de tabuleiro de raciocínio lógico-matemático que tem como objetivo colher o maior número de sementes. O tabuleiro do mancala conta com 14 espaços ou orifícios dispostos seis em cada lado e um em cada extremo do tabuleiro. Só é permitido apenas dois jogadores. O jogo começa por turnos, o primeiro jogador pega as quatro sementes de uma das seis cavidades e “semeia” de uma em uma a começar pela casinha seguinte à sua direita. O movimento se faz em sentido anti-horário, sendo conhecido como movimento de semeadura. Se, ao mover as peças, termina em seu armazém, joga de novamente. Do contrário, termina seu turno, dando vez ao outro jogador. O jogo termina quando um jogador não tem mais sementes para semear. Neste caso, o outro jogador tem direito de capturar as sementes. O jogador que tiver capturado mais sementes é o ganhador.
+            
+            Regras: 
+            -Se você passa pelo armazém do seu adversário, durante a semeadura, não tem que colocar peças nela. Você só pode colocar sementes no seu próprio armazém. 
+            -Se a última peça da semeadura ocupa uma cavidade vazia do seu lado do tabuleiro, você pode capturar todas as sementes da cavidade oposta e a sua própria. Todas essas sementes capturadas são colocadas diretamente em seu armazém.
+        ''')
+
+        os.system('pause')
+
+        return self
+
+    def manual_projeto(self):
+        os.system('cls')
+        print(self.__str__())
+
+        os.system('pause')
+
+        return self
+
+    def estatistica(self):
+        '''
+            Estatísticas de um jogador
+        '''
+
+        os.system('cls')
+
+        print('Insira o nome do jogador para ver a estatística: ')
+
+        jogadorNome = input()
+
+        jogador = Jogador()
+
+        jogador.set_nome(jogadorNome)
+        exist = jogador.carregar()
+
+        if (exist):
+            jogador.mostrar_estatistica()
+
+        os.system('pause')
+
+        return self
